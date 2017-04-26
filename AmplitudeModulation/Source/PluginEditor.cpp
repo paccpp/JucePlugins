@@ -22,7 +22,7 @@ AmplitudeModulationAudioProcessorEditor::AmplitudeModulationAudioProcessorEditor
     
     addAndMakeVisible(m_freq_slider);
     
-    m_freq_slider.setRange(0, 200);
+    m_freq_slider.setRange(0, 20);
     m_freq_slider.addListener(this);
 }
 

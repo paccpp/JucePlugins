@@ -31,6 +31,7 @@ public:
     void sliderValueChanged(Slider* slider) override;
 
 private:
+    
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     AmplitudeModulationAudioProcessor& m_processor;

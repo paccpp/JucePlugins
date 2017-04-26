@@ -129,19 +129,27 @@ bool AmplitudeModulationAudioProcessor::isBusesLayoutSupported (const BusesLayou
 void AmplitudeModulationAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
     const int totalNumInputChannels  = getTotalNumInputChannels();
-    //const int totalNumOutputChannels = getTotalNumOutputChannels();
+    const int totalNumOutputChannels = getTotalNumOutputChannels();
     
     for(int i = 0; i < buffer.getNumSamples(); ++i)
     {
         float amp = m_osc.process();
         
-        // This is the place where you'd normally do the guts of your plugin's
-        // audio processing...
-        for(int channel = 0; channel < totalNumInputChannels; ++channel)
+        // pour tous les canaux de sortie:
+        for(int channel = 0; channel < totalNumOutputChannels; ++channel)
         {
-            float* channelData = buffer.getWritePointer(channel);
+            float* outputs = buffer.getWritePointer(channel);
             
-            channelData[i] *= amp;
+            // si on a un canal d'entree correspondant:
+            if(channel < totalNumInputChannels)
+            {
+                float const* input = buffer.getReadPointer(channel);
+                outputs[i] = input[i] * amp;
+            }
+            else
+            {
+                outputs[i] = 0.f;
+            }
         }
     }
 }
