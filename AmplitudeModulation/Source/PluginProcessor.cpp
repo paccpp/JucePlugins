@@ -96,6 +96,34 @@ void AmplitudeModulationAudioProcessor::prepareToPlay (double sampleRate, int sa
     m_osc.setSampleRate(sampleRate);
 }
 
+void AmplitudeModulationAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
+{
+    const int totalNumInputChannels  = getTotalNumInputChannels();
+    const int totalNumOutputChannels = getTotalNumOutputChannels();
+    
+    for(int i = 0; i < buffer.getNumSamples(); ++i)
+    {
+        float amp = m_osc.process();
+        
+        // pour tous les canaux de sortie:
+        for(int channel = 0; channel < totalNumOutputChannels; ++channel)
+        {
+            float* outputs = buffer.getWritePointer(channel);
+            
+            // si on a un canal d'entree correspondant:
+            if(channel < totalNumInputChannels)
+            {
+                float const* input = buffer.getReadPointer(channel);
+                outputs[i] = input[i] * amp;
+            }
+            else
+            {
+                outputs[i] = 0.f;
+            }
+        }
+    }
+}
+
 void AmplitudeModulationAudioProcessor::releaseResources()
 {
     // When playback stops, you can use this as an opportunity to free up any
@@ -125,34 +153,6 @@ bool AmplitudeModulationAudioProcessor::isBusesLayoutSupported (const BusesLayou
   #endif
 }
 #endif
-
-void AmplitudeModulationAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
-{
-    const int totalNumInputChannels  = getTotalNumInputChannels();
-    const int totalNumOutputChannels = getTotalNumOutputChannels();
-    
-    for(int i = 0; i < buffer.getNumSamples(); ++i)
-    {
-        float amp = m_osc.process();
-        
-        // pour tous les canaux de sortie:
-        for(int channel = 0; channel < totalNumOutputChannels; ++channel)
-        {
-            float* outputs = buffer.getWritePointer(channel);
-            
-            // si on a un canal d'entree correspondant:
-            if(channel < totalNumInputChannels)
-            {
-                float const* input = buffer.getReadPointer(channel);
-                outputs[i] = input[i] * amp;
-            }
-            else
-            {
-                outputs[i] = 0.f;
-            }
-        }
-    }
-}
 
 //==============================================================================
 bool AmplitudeModulationAudioProcessor::hasEditor() const

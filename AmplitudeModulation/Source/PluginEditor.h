@@ -36,7 +36,8 @@ private:
     // access the processor object that created it.
     AmplitudeModulationAudioProcessor& m_processor;
     
-    juce::Slider m_freq_slider;
+    juce::Slider    m_freq_slider;
+    juce::Label     m_freq_label;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmplitudeModulationAudioProcessorEditor)
 };
