@@ -14,16 +14,9 @@
 
 //==============================================================================
 AmplitudeModulationAudioProcessor::AmplitudeModulationAudioProcessor()
-#ifndef JucePlugin_PreferredChannelConfigurations
      : AudioProcessor (BusesProperties()
-                     #if ! JucePlugin_IsMidiEffect
-                      #if ! JucePlugin_IsSynth
                        .withInput  ("Input",  AudioChannelSet::stereo(), true)
-                      #endif
-                       .withOutput ("Output", AudioChannelSet::stereo(), true)
-                     #endif
-                       )
-#endif
+                       .withOutput ("Output", AudioChannelSet::stereo(), true))
 {
     m_osc.setFrequency(2);
 }
@@ -35,6 +28,16 @@ AmplitudeModulationAudioProcessor::~AmplitudeModulationAudioProcessor()
 void AmplitudeModulationAudioProcessor::setFrequency(double new_freq)
 {
     m_osc.setFrequency(new_freq);
+}
+
+void AmplitudeModulationAudioProcessor::setTremoloDepth(double new_depth)
+{
+    m_depth.setValue(new_depth);
+}
+
+void AmplitudeModulationAudioProcessor::setOutputGain(double new_gain)
+{
+    m_gain.setValue(new_gain);
 }
 
 //==============================================================================
@@ -94,6 +97,8 @@ void AmplitudeModulationAudioProcessor::changeProgramName (int index, const Stri
 void AmplitudeModulationAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     m_osc.setSampleRate(sampleRate);
+    m_depth.reset(sampleRate, 0.05);
+    m_gain.reset(sampleRate, 0.05);
 }
 
 void AmplitudeModulationAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
@@ -103,7 +108,10 @@ void AmplitudeModulationAudioProcessor::processBlock (AudioSampleBuffer& buffer,
     
     for(int i = 0; i < buffer.getNumSamples(); ++i)
     {
-        float amp = m_osc.process();
+        const float lfo = m_osc.process();
+        const float depth = m_depth.getNextValue();
+        const float gain = m_gain.getNextValue();
+        const float mod = lfo * depth + (1. - depth);
         
         // pour tous les canaux de sortie:
         for(int channel = 0; channel < totalNumOutputChannels; ++channel)
@@ -114,7 +122,7 @@ void AmplitudeModulationAudioProcessor::processBlock (AudioSampleBuffer& buffer,
             if(channel < totalNumInputChannels)
             {
                 float const* input = buffer.getReadPointer(channel);
-                outputs[i] = input[i] * amp;
+                outputs[i] = input[i] * mod * gain;
             }
             else
             {

@@ -26,6 +26,10 @@ public:
     ~AmplitudeModulationAudioProcessor();
     
     void setFrequency(double new_freq);
+    
+    void setTremoloDepth(double new_depth);
+    
+    void setOutputGain(double new_gain);
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
@@ -62,6 +66,9 @@ public:
 private:
     
     paccpp::Osc<float> m_osc;
+    
+    juce::LinearSmoothedValue<float> m_depth;
+    juce::LinearSmoothedValue<float> m_gain;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmplitudeModulationAudioProcessor)
