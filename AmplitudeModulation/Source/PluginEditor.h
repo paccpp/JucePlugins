@@ -38,6 +38,12 @@ private:
     
     juce::Slider    m_freq_slider;
     juce::Label     m_freq_label;
+    
+    juce::Slider    m_depth_slider;
+    juce::Label     m_depth_label;
+    
+    juce::Slider    m_gain_slider;
+    juce::Label     m_gain_label;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmplitudeModulationAudioProcessorEditor)
 };
